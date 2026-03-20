@@ -1,6 +1,5 @@
 /* ============================================
-   Good Code Bad Code — VS Code Edition
-   Game Logic
+   Good Code Bad Code — Game Logic
    ============================================ */
 
 // --- Question Data (15 scenarios covering all 12 required categories) ---
@@ -241,13 +240,13 @@ res.cookie("session", id);`,
   }
 ];
 
-// --- Audio Feedback (Web Audio API - no external files needed) ---
+// --- Audio Feedback (Web Audio API) ---
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
 
 function getAudioCtx() {
   if (!audioCtx) {
-    try { audioCtx = new AudioCtx(); } catch (e) { /* no audio support */ }
+    try { audioCtx = new AudioCtx(); } catch (e) { /* no audio */ }
   }
   return audioCtx;
 }
@@ -269,13 +268,13 @@ function playTone(freq, duration, type) {
 
 function playCorrectSound() {
   playTone(523, 0.12, "sine");
-  setTimeout(() => playTone(659, 0.12, "sine"), 100);
-  setTimeout(() => playTone(784, 0.2, "sine"), 200);
+  setTimeout(function() { playTone(659, 0.12, "sine"); }, 100);
+  setTimeout(function() { playTone(784, 0.2, "sine"); }, 200);
 }
 
 function playIncorrectSound() {
   playTone(330, 0.15, "square");
-  setTimeout(() => playTone(277, 0.25, "square"), 130);
+  setTimeout(function() { playTone(277, 0.25, "square"); }, 130);
 }
 
 // --- Game State ---
@@ -289,11 +288,13 @@ const TOTAL_QUESTIONS = 10;
 const scoreDisplay = document.getElementById("scoreDisplay");
 const progressBar = document.getElementById("progressBar");
 const questionCount = document.getElementById("questionCount");
-const breadcrumbScenario = document.getElementById("breadcrumbScenario");
+const scenario = document.getElementById("scenario");
 const cardLeft = document.getElementById("cardLeft");
 const cardRight = document.getElementById("cardRight");
 const codeLeft = document.getElementById("codeLeft");
 const codeRight = document.getElementById("codeRight");
+const btnLeft = document.getElementById("btnLeft");
+const btnRight = document.getElementById("btnRight");
 const feedback = document.getElementById("feedback");
 const feedbackIcon = document.getElementById("feedbackIcon");
 const feedbackText = document.getElementById("feedbackText");
@@ -301,15 +302,14 @@ const explanation = document.getElementById("explanation");
 const nextBtn = document.getElementById("nextBtn");
 const gameContainer = document.getElementById("gameContainer");
 const endScreen = document.getElementById("endScreen");
+const endIcon = document.getElementById("endIcon");
 const endTitle = document.getElementById("endTitle");
 const endScore = document.getElementById("endScore");
 const endMessage = document.getElementById("endMessage");
 const restartBtn = document.getElementById("restartBtn");
-const restartBtn2 = document.getElementById("restartBtn2");
 
 // --- Utilities ---
 
-/** Fisher-Yates shuffle */
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -319,17 +319,12 @@ function shuffle(arr) {
   return a;
 }
 
-/** Convert scenario name to kebab-case breadcrumb */
-function toBreadcrumb(scenario) {
-  return scenario.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-}
-
-/** Render code with line number spans for CSS counters */
+/** Render code with line number spans */
 function renderCode(codeEl, codeStr) {
-  const lines = codeStr.split('\n');
+  var lines = codeStr.split('\n');
   codeEl.innerHTML = '';
   lines.forEach(function(line) {
-    const span = document.createElement('span');
+    var span = document.createElement('span');
     span.className = 'line';
     span.textContent = line || ' ';
     codeEl.appendChild(span);
@@ -338,10 +333,9 @@ function renderCode(codeEl, codeStr) {
 
 // --- Core Game Logic ---
 
-/** Initialize a new game round */
 function startGame() {
   gameQuestions = shuffle(questions).slice(0, TOTAL_QUESTIONS).map(function(q) {
-    const goodOnLeft = Math.random() < 0.5;
+    var goodOnLeft = Math.random() < 0.5;
     return {
       scenario: q.scenario,
       goodCode: q.goodCode,
@@ -358,46 +352,36 @@ function startGame() {
   answered = false;
 
   endScreen.classList.add("hidden");
-  gameContainer.parentElement.style.display = '';
-  gameContainer.style.display = '';
-
-  // Ensure editor area is visible
-  var contentArea = document.querySelector('.content-area');
-  if (contentArea) contentArea.style.display = '';
-
+  gameContainer.classList.remove("hidden");
   renderQuestion();
 }
 
-/** Render the current question */
 function renderQuestion() {
-  const q = gameQuestions[currentIndex];
+  var q = gameQuestions[currentIndex];
   answered = false;
 
-  // Update status bar
   scoreDisplay.textContent = "Score: " + score + " / " + currentIndex;
   questionCount.textContent = "Question " + (currentIndex + 1) + " of " + TOTAL_QUESTIONS;
   progressBar.style.width = ((currentIndex / TOTAL_QUESTIONS) * 100) + "%";
 
-  // Update breadcrumb
-  breadcrumbScenario.textContent = toBreadcrumb(q.scenario);
+  scenario.textContent = q.scenario;
 
-  // Render code with line numbers
   renderCode(codeLeft, q.leftCode);
   renderCode(codeRight, q.rightCode);
 
-  // Reset pane states
-  cardLeft.className = "editor-pane";
-  cardRight.className = "editor-pane";
+  cardLeft.className = "card";
+  cardRight.className = "card";
+  btnLeft.textContent = "Select";
+  btnRight.textContent = "Select";
   feedback.classList.add("hidden");
 }
 
-/** Handle card selection */
 function selectCard(side) {
   if (answered) return;
   answered = true;
 
-  const q = gameQuestions[currentIndex];
-  const isCorrect = side === q.correctSide;
+  var q = gameQuestions[currentIndex];
+  var isCorrect = side === q.correctSide;
 
   if (isCorrect) {
     score++;
@@ -406,36 +390,35 @@ function selectCard(side) {
     playIncorrectSound();
   }
 
-  // Highlight the selected pane
-  const selectedCard = side === "left" ? cardLeft : cardRight;
+  var selectedCard = side === "left" ? cardLeft : cardRight;
+  var selectedBtn = side === "left" ? btnLeft : btnRight;
 
   if (isCorrect) {
     selectedCard.classList.add("correct");
+    selectedBtn.textContent = "\u2713 Good Code";
   } else {
     selectedCard.classList.add("incorrect");
-    const correctCard = q.correctSide === "left" ? cardLeft : cardRight;
+    selectedBtn.textContent = "\u2717 Bad Code";
+    var correctCard = q.correctSide === "left" ? cardLeft : cardRight;
+    var correctBtn = q.correctSide === "left" ? btnLeft : btnRight;
     correctCard.classList.add("reveal-correct");
+    correctBtn.textContent = "\u2713 Good Code";
   }
 
-  // Disable both panes
   cardLeft.classList.add("disabled");
   cardRight.classList.add("disabled");
 
-  // Show terminal feedback
-  feedbackIcon.textContent = isCorrect ? "\u2713 " : "\u2717 ";
-  feedbackIcon.className = "terminal-result " + (isCorrect ? "correct-text" : "incorrect-text");
-  feedbackText.textContent = isCorrect ? "PASS: Security check passed" : "FAIL: Security vulnerability detected";
-  feedbackText.className = "terminal-result " + (isCorrect ? "correct-text" : "incorrect-text");
+  feedbackIcon.textContent = isCorrect ? "\u2705" : "\u274c";
+  feedbackText.textContent = isCorrect ? "Correct!" : "Incorrect!";
+  feedbackText.className = "feedback-text " + (isCorrect ? "correct-text" : "incorrect-text");
   explanation.textContent = q.explanation;
 
   nextBtn.textContent = (currentIndex >= TOTAL_QUESTIONS - 1) ? "See Results" : "Next Question";
-
   feedback.classList.remove("hidden");
 
   scoreDisplay.textContent = "Score: " + score + " / " + (currentIndex + 1);
 }
 
-/** Advance to next question or show end screen */
 function nextQuestion() {
   currentIndex++;
   if (currentIndex >= TOTAL_QUESTIONS) {
@@ -445,48 +428,39 @@ function nextQuestion() {
   }
 }
 
-/** Display the final results screen */
 function showEndScreen() {
-  // Hide the editor content area
-  var contentArea = document.querySelector('.content-area');
-  if (contentArea) contentArea.style.display = 'none';
-
+  gameContainer.classList.add("hidden");
   endScreen.classList.remove("hidden");
 
-  const pct = Math.round((score / TOTAL_QUESTIONS) * 100);
+  var pct = Math.round((score / TOTAL_QUESTIONS) * 100);
   endScore.textContent = score + " / " + TOTAL_QUESTIONS;
 
   if (pct === 100) {
-    endTitle.textContent = "Build Succeeded";
-    endMessage.textContent = "0 errors, 0 warnings. You're a security expert — every codebase is safer with you on the team.";
+    endIcon.textContent = "\uD83C\uDF1F";
+    endTitle.textContent = "Perfect Score!";
+    endMessage.textContent = "You're a security expert. Every codebase is safer with you on the team.";
   } else if (pct >= 80) {
-    endTitle.textContent = "Build Succeeded";
-    endMessage.textContent = (TOTAL_QUESTIONS - score) + " warning(s). You have a strong eye for secure code. Keep it up!";
+    endIcon.textContent = "\uD83C\uDF89";
+    endTitle.textContent = "Great Job!";
+    endMessage.textContent = "You have a strong eye for secure code. Keep it up!";
   } else if (pct >= 60) {
-    endTitle.textContent = "Build Completed with Warnings";
-    endMessage.textContent = (TOTAL_QUESTIONS - score) + " warning(s) found. Review the output to strengthen your knowledge.";
+    endIcon.textContent = "\uD83D\uDC4D";
+    endTitle.textContent = "Not Bad!";
+    endMessage.textContent = "You're getting there. Review the explanations to strengthen your knowledge.";
   } else {
-    endTitle.textContent = "Build Failed";
-    endMessage.textContent = (TOTAL_QUESTIONS - score) + " error(s) detected. Security takes practice — try again and read the output carefully.";
+    endIcon.textContent = "\uD83D\uDCDA";
+    endTitle.textContent = "Keep Learning!";
+    endMessage.textContent = "Security takes practice. Try again and read the explanations carefully.";
   }
 
   progressBar.style.width = "100%";
 }
 
 // --- Event Listeners ---
-cardLeft.addEventListener("click", function() { selectCard("left"); });
-cardRight.addEventListener("click", function() { selectCard("right"); });
-
-cardLeft.addEventListener("keydown", function(e) {
-  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectCard("left"); }
-});
-cardRight.addEventListener("keydown", function(e) {
-  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectCard("right"); }
-});
-
+btnLeft.addEventListener("click", function() { selectCard("left"); });
+btnRight.addEventListener("click", function() { selectCard("right"); });
 nextBtn.addEventListener("click", nextQuestion);
 restartBtn.addEventListener("click", startGame);
-if (restartBtn2) restartBtn2.addEventListener("click", startGame);
 
-// --- Launch the game ---
+// --- Start ---
 startGame();
