@@ -7,54 +7,145 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <h1 class="title">Good Code <span class="title-accent">Bad Code</span></h1>
-        <p class="subtitle">Can you spot the secure code?</p>
-    </header>
+    <!-- VS Code Window -->
+    <div class="vscode-window">
 
-    <!-- Game Area -->
-    <main class="game-container" id="gameContainer">
-        <!-- Score & Progress -->
-        <div class="status-bar">
-            <div class="score" id="scoreDisplay">Score: 0 / 0</div>
-            <div class="progress-wrapper">
-                <div class="progress-bar" id="progressBar"></div>
+        <!-- Title Bar -->
+        <div class="titlebar">
+            <div class="titlebar-controls">
+                <span class="control close"></span>
+                <span class="control minimize"></span>
+                <span class="control maximize"></span>
             </div>
-            <div class="question-count" id="questionCount">Question 1 of 10</div>
+            <div class="titlebar-title">Good Code <span class="titlebar-accent">Bad Code</span> — Visual Studio Code</div>
+            <div class="titlebar-spacer"></div>
         </div>
 
-        <!-- Scenario Label -->
-        <div class="scenario" id="scenario"></div>
+        <!-- Main Layout -->
+        <div class="main-layout">
 
-        <!-- Code Cards -->
-        <div class="cards-wrapper">
-            <div class="card" id="cardLeft" tabindex="0" role="button" aria-label="Select left code snippet">
-                <div class="card-label">Option A</div>
-                <pre class="code-block"><code id="codeLeft"></code></pre>
+            <!-- Activity Bar (left icons) -->
+            <div class="activity-bar">
+                <div class="activity-icon active" title="Explorer">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 0h-9L7 1.5V6H2.5L1 7.5v15.07L2.5 24h12.07L16 22.57V18h4.7l1.3-1.43V4.5L17.5 0zm0 2.12l2.38 2.38H17.5V2.12zm-3 20.38h-12v-15H7v9.07L8.5 18h6v4.5zm6-6h-12v-15H16V6h4.5v10.5z"/></svg>
+                </div>
+                <div class="activity-icon" title="Search">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M15.25 0a8.25 8.25 0 0 0-6.18 13.72L1 22.88l1.12 1.12 8.05-9.12A8.251 8.251 0 1 0 15.25.01V0zm0 15a6.75 6.75 0 1 1 0-13.5 6.75 6.75 0 0 1 0 13.5z"/></svg>
+                </div>
+                <div class="activity-icon" title="Source Control">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M21.007 8.222A3.738 3.738 0 0 0 15.045 5.2a3.737 3.737 0 0 0 1.156 6.583 2.988 2.988 0 0 1-2.668 1.67h-2.99a4.456 4.456 0 0 0-2.989 1.165V7.4a3.737 3.737 0 1 0-1.494 0v9.117a3.776 3.776 0 1 0 1.816.099 2.99 2.99 0 0 1 2.668-1.667h2.99a4.484 4.484 0 0 0 4.223-3.039 3.736 3.736 0 0 0 3.25-3.687zM4.565 3.738a2.242 2.242 0 1 1 4.484 0 2.242 2.242 0 0 1-4.484 0zm4.484 16.441a2.242 2.242 0 1 1-4.484 0 2.242 2.242 0 0 1 4.484 0zm8.221-9.715a2.242 2.242 0 1 1 0-4.485 2.242 2.242 0 0 1 0 4.485z"/></svg>
+                </div>
+                <div class="activity-icon" title="Extensions">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 1.5L15 0h7.5L24 1.5V9l-1.5 1.5H15L13.5 9V1.5zm3 0V9h6V1.5h-6zm-13.5 3L4.5 3H12l1.5 1.5V12L12 13.5H4.5L3 12V4.5zm3 0V12h6V4.5h-6zM0 15l1.5-1.5H9L10.5 15v7.5L9 24H1.5L0 22.5V15zm3 0v7.5h6V15H3zm10.5 0L15 13.5h7.5L24 15v7.5L22.5 24H15l-1.5-1.5V15zm3 0v7.5h6V15h-6z"/></svg>
+                </div>
             </div>
-            <div class="card" id="cardRight" tabindex="0" role="button" aria-label="Select right code snippet">
-                <div class="card-label">Option B</div>
-                <pre class="code-block"><code id="codeRight"></code></pre>
+
+            <!-- Content Area -->
+            <div class="content-area">
+
+                <!-- Editor Tabs -->
+                <div class="tab-bar" id="tabBar">
+                    <div class="tab active" id="tabChallenge">
+                        <span class="tab-icon">JS</span>
+                        <span class="tab-name">challenge.js</span>
+                        <span class="tab-close">&times;</span>
+                    </div>
+                    <div class="tab" id="tabResults">
+                        <span class="tab-icon">JS</span>
+                        <span class="tab-name">results.js</span>
+                        <span class="tab-close">&times;</span>
+                    </div>
+                </div>
+
+                <!-- Breadcrumb -->
+                <div class="breadcrumb" id="breadcrumb">
+                    <span class="crumb">security</span>
+                    <span class="crumb-sep">›</span>
+                    <span class="crumb" id="breadcrumbScenario">sql-injection</span>
+                </div>
+
+                <!-- Game Area -->
+                <div class="editor-area" id="gameContainer">
+
+                    <!-- Split Editor Panes -->
+                    <div class="split-editor">
+                        <div class="editor-pane" id="cardLeft" tabindex="0" role="button" aria-label="Select left code snippet">
+                            <div class="pane-tab-bar">
+                                <div class="pane-tab active" id="paneTabLeft">option_a.js</div>
+                            </div>
+                            <pre class="code-editor"><code id="codeLeft"></code></pre>
+                        </div>
+                        <div class="split-divider"></div>
+                        <div class="editor-pane" id="cardRight" tabindex="0" role="button" aria-label="Select right code snippet">
+                            <div class="pane-tab-bar">
+                                <div class="pane-tab active" id="paneTabRight">option_b.js</div>
+                            </div>
+                            <pre class="code-editor"><code id="codeRight"></code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Terminal / Output Panel -->
+                    <div class="terminal-panel hidden" id="feedback">
+                        <div class="terminal-tabs">
+                            <div class="terminal-tab active">TERMINAL</div>
+                            <div class="terminal-tab">OUTPUT</div>
+                            <div class="terminal-tab">PROBLEMS</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="terminal-cmd">node security-check.js</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-result" id="feedbackIcon"></span>
+                                <span class="terminal-result" id="feedbackText"></span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-explanation" id="explanation"></span>
+                            </div>
+                            <div class="terminal-line terminal-action">
+                                <button class="btn-vscode" id="nextBtn">Next Question</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Feedback -->
-        <div class="feedback hidden" id="feedback">
-            <div class="feedback-icon" id="feedbackIcon"></div>
-            <div class="feedback-text" id="feedbackText"></div>
-            <div class="explanation" id="explanation"></div>
-            <button class="btn btn-next" id="nextBtn">Next Question</button>
+        <!-- Status Bar -->
+        <div class="statusbar">
+            <div class="statusbar-left">
+                <span class="statusbar-item branch">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-1px"><path d="M21.007 8.222A3.738 3.738 0 0 0 15.045 5.2a3.737 3.737 0 0 0 1.156 6.583 2.988 2.988 0 0 1-2.668 1.67h-2.99a4.456 4.456 0 0 0-2.989 1.165V7.4a3.737 3.737 0 1 0-1.494 0v9.117a3.776 3.776 0 1 0 1.816.099 2.99 2.99 0 0 1 2.668-1.667h2.99a4.484 4.484 0 0 0 4.223-3.039 3.736 3.736 0 0 0 3.25-3.687zM4.565 3.738a2.242 2.242 0 1 1 4.484 0 2.242 2.242 0 0 1-4.484 0zm4.484 16.441a2.242 2.242 0 1 1-4.484 0 2.242 2.242 0 0 1-4.484 0zm8.221-9.715a2.242 2.242 0 1 1 0-4.485 2.242 2.242 0 0 1 0 4.485z"/></svg>
+                    main
+                </span>
+                <span class="statusbar-item" id="scoreDisplay">Score: 0 / 0</span>
+            </div>
+            <div class="statusbar-right">
+                <span class="statusbar-item" id="questionCount">Question 1 of 10</span>
+                <span class="statusbar-item">UTF-8</span>
+                <span class="statusbar-item">JavaScript</span>
+            </div>
         </div>
-    </main>
 
-    <!-- End Screen -->
+        <!-- Progress Bar (VS Code loading style) -->
+        <div class="progress-track">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- End Screen (VS Code notification modal) -->
     <div class="end-screen hidden" id="endScreen">
-        <div class="end-card">
-            <h2 class="end-title" id="endTitle"></h2>
-            <div class="end-score" id="endScore"></div>
-            <div class="end-message" id="endMessage"></div>
-            <button class="btn btn-restart" id="restartBtn">Play Again</button>
+        <div class="end-modal">
+            <div class="end-modal-titlebar">
+                <span class="end-modal-title" id="endTitle"></span>
+                <button class="end-modal-close" id="restartBtn">&times;</button>
+            </div>
+            <div class="end-modal-body">
+                <div class="end-score" id="endScore"></div>
+                <div class="end-message" id="endMessage"></div>
+                <button class="btn-vscode btn-primary" id="restartBtn2">Play Again</button>
+            </div>
         </div>
     </div>
 
